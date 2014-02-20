@@ -51,17 +51,27 @@ var Game = new function() { // single instance
     this.setBoard = function(zIndex, board) { boards[zIndex] = board; };
 }();
 
+// @see spritecow.com to get positions of sprites from a sprite-sheet
 var sprites = {
-    ship: { sx:32, sy:392, w:26, h:32, frames:0 },
-    shipExplosion: { sx:60, sy:374, w:64, h:64, frames:4 },
-    alien1: { sx:0, sy:0, w:24, h:24, frames:3 },
-    alienExplosion: { sx:0, sy:336, w:32, h:32, frames:4 }
+    ship: { sx:238, sy:70, w:26, h:32, frames:0 },
+    shipExplosion: { sx:0, sy:340, w:64, h:64, frames:3 },
+    alien1: { sx:0, sy:0, w:24, h:24, frames:2 },
+    alien1RollLeft: { sx:0, sy:24, w:24, h:24, frames:8 },
+    alien1RollRight: { sx:0, sy:48, w:24, h:24, frames:8 },
+    alien2: { sx:0, sy:72, w:24, h:24, frames:2 },
+    alien2RollLeft: { sx:0, sy:96, w:24, h:24, frames:8 },
+    alien2RollRight: { sx:0, sy:120, w:24, h:24, frames:8 },
+    alien3: { sx:0, sy:144, w:24, h:24, frames:0 },
+    alien3RollLeft: { sx:0, sy:168, w:24, h:24, frames:8 },
+    alien3RollRight: { sx:0, sy:192, w:24, h:24, frames:8 },
+    alienExplosion: { sx:0, sy:306, w:34, h:34, frames:3 },
+    life: { sx:288, sy:80, w:18, h:22, frames:0 },
+    flag: { sx:272, sy:80, w:14, h:22, frames:0 }
+
 };
 
 var startGame = function() {
-    SpriteSheet.draw(Game.ctx, 'ship', 100, 100, 0);
-    //SpriteSheet.draw(Game.ctx, 'shipExplosion', 100, 100, 0);
-    //SpriteSheet.draw(Game.ctx, 'alien1', 100, 100, 2);
+    SpriteSheet.draw(Game.ctx, 'ship', 0, 0, 0);
 };
 
 window.addEventListener('load', function() {

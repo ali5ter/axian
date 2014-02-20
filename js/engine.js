@@ -2,7 +2,7 @@
    engine.js
 */
 
-var SpriteSheet = new function() { // singal instance
+var SpriteSheet = new function() { // single instance
 
     this.map = {};
 
