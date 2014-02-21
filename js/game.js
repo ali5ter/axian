@@ -53,6 +53,7 @@ var Game = new function() { // singleton
 var sprites = {
         ship: { sx:238, sy:70, w:26, h:32, frames:0 },
         shipExplosion: { sx:0, sy:340, w:64, h:64, frames:3 },
+        shipMissile: { sx:240, sy:48, w:2, h:8, frames:0 },
         alien1: { sx:0, sy:0, w:24, h:24, frames:2 },
         alien1RollLeft: { sx:0, sy:24, w:24, h:24, frames:8 },
         alien1RollRight: { sx:0, sy:48, w:24, h:24, frames:8 },
@@ -63,6 +64,7 @@ var sprites = {
         alien3RollLeft: { sx:0, sy:168, w:24, h:24, frames:8 },
         alien3RollRight: { sx:0, sy:192, w:24, h:24, frames:8 },
         alienExplosion: { sx:0, sy:306, w:34, h:34, frames:3 },
+        alienMissile: { sx:244, sy:48, w:2, h:8, frames:0 },
         life: { sx:288, sy:80, w:18, h:22, frames:0 },
         flag: { sx:272, sy:80, w:14, h:22, frames:0 }
     };
@@ -117,20 +119,21 @@ var StarField = function(speed, opacity, numStars, clear) {
     };
 };
 
-var Ship = function() {
+var PlayerShip = function() {
     this.w = SpriteSheet.map.ship.w;
     this.h = SpriteSheet.map.ship.h;
     this.x = Game.width/2 - this.w/2;
     this.y = Game.height - 30 - this.h;
     this.vx = 0;
+    this.maxVel = 200;
+    this.reloadTime = 0.25;
+    this.reload = this.reloadTime;
 
     this.draw = function(ctx) {
         SpriteSheet.draw(ctx, 'ship', this.x, this.y, 0);
     };
 
     this.step = function(dt) {
-        this.maxVel = 200;
-
         if (Game.keys.left) this.vx = -this.maxVel;
         else if (Game.keys.right) this.vx = this.maxVel;
         else this.vx = 0;
@@ -139,7 +142,32 @@ var Ship = function() {
 
         if (this.x < 0) this.x = 0;
         else if(this.x > Game.width - this.w) this.x = Game.width - this.w;
+
+        this.reload -= dt;
+        // TODO: if this.reload < 0 then place missle ready for fire
+        if (Game.keys.fire && this.reload < 0) {
+            Game.keys.fire = false;
+            this.reload = this.reloadTime;
+            this.board.add(new PlayerMissile(this.x + this.w/2, this.y));
+        }
     };
+};
+
+var PlayerMissile = function(x, y) {
+    this.w = SpriteSheet.map.shipMissile.w;
+    this.h = SpriteSheet.map.shipMissile.h;
+    this.x = x - this.w/2;
+    this.y = y - this.h;
+    this.vy = -700;
+};
+
+PlayerMissile.prototype.step = function(dt) {
+    this.y += this.vy * dt;
+    if (this.y < - this.h) { this.board.remove(this); }
+};
+
+PlayerMissile.prototype.draw = function(ctx) {
+    SpriteSheet.draw(ctx, 'shipMissile', this.x, this.y);
 };
 
 var Lives = function() {
@@ -172,7 +200,7 @@ var startGame = function() {
 var playGame = function() {
     var board = new GameBoard();
 
-    board.add(new Ship());
+    board.add(new PlayerShip());
 
     Game.setBoard(3, board);
     Game.setBoard(4, new Lives(2));
