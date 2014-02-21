@@ -120,7 +120,12 @@ var StarField = function(speed, opacity, numStars, clear) {
 var startGame = function() {
     Game.setBoard(0, new StarField(20, 0.3, 100, true));
     Game.setBoard(1, new StarField(50, 0.6, 60));
-    Game.setBoard(3, new StarField(100, 1.0, 40));
+    Game.setBoard(2, new StarField(100, 1.0, 40));
+    Game.setBoard(3, new TitleScreen('Axian', 'Fire to start playing', playGame));
+};
+
+var playGame = function() {
+    Game.setBoard(3, new TitleScreen('Axian', 'Started...'));
 };
 
 window.addEventListener('load', function() {
