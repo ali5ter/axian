@@ -83,7 +83,7 @@ var StarField = function(speed, opacity, numStars, clear) {
     starsCtx.globalAlpha = opacity;
     var r = function (max, min) {
         if (!min) min = 0;
-        return Math.floor(Math.random()*(max-min)+min);i
+        return Math.floor(Math.random()*(max-min)+min);
     };
     for (var i = 0; i < numStars; i++) { // draw stars
         starsCtx.fillStyle = 'rgb('+ r(256) +','+  r(256) +','+ r(256) +')';
@@ -117,15 +117,61 @@ var StarField = function(speed, opacity, numStars, clear) {
     };
 };
 
+var Ship = function() {
+    this.w = SpriteSheet.map.ship.w;
+    this.h = SpriteSheet.map.ship.h;
+    this.x = Game.width/2 - this.w/2;
+    this.y = Game.height - 30 - this.h;
+    this.vx = 0;
+
+    this.draw = function(ctx) {
+        SpriteSheet.draw(ctx, 'ship', this.x, this.y, 0);
+    };
+
+    this.step = function(dt) {
+        this.maxVel = 200;
+
+        if (Game.keys.left) this.vx = -this.maxVel;
+        else if (Game.keys.right) this.vx = this.maxVel;
+        else this.vx = 0;
+
+        this.x += this.vx * dt;
+
+        if (this.x < 0) this.x = 0;
+        else if(this.x > Game.width - this.w) this.x = Game.width - this.w;
+    };
+};
+
+var Lives = function() {
+    this.w = SpriteSheet.map.life.w;
+    this.h = SpriteSheet.map.life.h;
+    this.x = 0;
+    this.y = Game.height - this.h;
+    this.remaining = 2;
+
+    this.draw = function(ctx) {
+        for (var i = 0; i < this.remaining; i++) {
+            SpriteSheet.draw(ctx, 'life', (this.w+8)*i, this.y, 0);
+        }
+    };
+
+    this.step = function(dt) {
+        //TODO: anything to do?
+    };
+
+};
+
+
 var startGame = function() {
-    Game.setBoard(0, new StarField(20, 0.3, 100, true));
-    Game.setBoard(1, new StarField(50, 0.6, 60));
-    Game.setBoard(2, new StarField(100, 1.0, 40));
+    Game.setBoard(0, new StarField(20, 0.3, 80, true));
+    Game.setBoard(1, new StarField(50, 0.6, 40));
+    Game.setBoard(2, new StarField(100, 1.0, 10));
     Game.setBoard(3, new TitleScreen('Axian', 'Fire to start playing', playGame));
 };
 
 var playGame = function() {
-    Game.setBoard(3, new TitleScreen('Axian', 'Started...'));
+    Game.setBoard(3, new Ship());
+    Game.setBoard(5, new Lives(2));
 };
 
 window.addEventListener('load', function() {
