@@ -2,7 +2,7 @@
    game.js
 */
 
-var Game = new function() { // single instance
+var Game = new function() { // singleton
 
     var KEYS = { 37:'left', 39:'right', 32:'fire' },
         boards = [];
@@ -163,15 +163,19 @@ var Lives = function() {
 
 
 var startGame = function() {
-    Game.setBoard(0, new StarField(20, 0.3, 80, true));
+    Game.setBoard(0, new StarField(20, 0.4, 80, true));
     Game.setBoard(1, new StarField(50, 0.6, 40));
     Game.setBoard(2, new StarField(100, 1.0, 10));
     Game.setBoard(3, new TitleScreen('Axian', 'Fire to start playing', playGame));
 };
 
 var playGame = function() {
-    Game.setBoard(3, new Ship());
-    Game.setBoard(5, new Lives(2));
+    var board = new GameBoard();
+
+    board.add(new Ship());
+
+    Game.setBoard(3, board);
+    Game.setBoard(4, new Lives(2));
 };
 
 window.addEventListener('load', function() {
