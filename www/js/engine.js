@@ -64,9 +64,10 @@ var TitleScreen = function(title, subtitle, callback) {
     this.draw = function(ctx) {
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
-        ctx.font = '40px virgo_01regular';
+        ctx.font = '80px virgo';
         ctx.fillText(title, Game.width/2, Game.height/2);
-        ctx.font = '20px virgo_01regular';
+        ctx.fillStyle = '#3fd9dd';
+        ctx.font = '14px joystix';
         ctx.fillText(subtitle, Game.width/2, Game.height/2 + 40);
     };
 
