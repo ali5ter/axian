@@ -51,9 +51,9 @@ var Game = new function() { // singleton
 }();
 
 var sprites = {
-        ship: { sx:238, sy:70, w:26, h:32, frames:0 },
+        ship: { sx:238, sy:62, w:26, h:40, frames:1 },
         shipExplosion: { sx:0, sy:340, w:64, h:64, frames:3 },
-        shipMissile: { sx:240, sy:48, w:2, h:8, frames:0 },
+        shipMissile: { sx:238, sy:34, w:2, h:8, frames:0 },
         alien1: { sx:0, sy:0, w:24, h:24, frames:2 },
         alien1RollLeft: { sx:0, sy:24, w:24, h:24, frames:8 },
         alien1RollRight: { sx:0, sy:48, w:24, h:24, frames:8 },
@@ -64,8 +64,8 @@ var sprites = {
         alien3RollLeft: { sx:0, sy:168, w:24, h:24, frames:8 },
         alien3RollRight: { sx:0, sy:192, w:24, h:24, frames:8 },
         alienExplosion: { sx:0, sy:306, w:34, h:34, frames:3 },
-        alienMissile: { sx:244, sy:48, w:2, h:8, frames:0 },
-        life: { sx:288, sy:80, w:18, h:22, frames:0 },
+        alienMissile: { sx:242, sy:34, w:2, h:8, frames:0 },
+        life: { sx:322, sy:80, w:18, h:22, frames:0 },
         flag: { sx:272, sy:80, w:14, h:22, frames:0 }
     };
 
@@ -130,7 +130,7 @@ var PlayerShip = function() {
     this.reload = this.reloadTime;
 
     this.draw = function(ctx) {
-        SpriteSheet.draw(ctx, 'ship', this.x, this.y, 0);
+        SpriteSheet.draw(ctx, 'ship', this.x, this.y, this.reload < 0 ? 1 : 0);
     };
 
     this.step = function(dt) {
@@ -143,8 +143,8 @@ var PlayerShip = function() {
         if (this.x < 0) this.x = 0;
         else if(this.x > Game.width - this.w) this.x = Game.width - this.w;
 
+        // TODO: Perhaps reload when missile off screen or collides
         this.reload -= dt;
-        // TODO: if this.reload < 0 then place missle ready for fire
         if (Game.keys.fire && this.reload < 0) {
             Game.keys.fire = false;
             this.reload = this.reloadTime;
@@ -188,7 +188,6 @@ var Lives = function() {
     };
 
 };
-
 
 var startGame = function() {
     Game.setBoard(0, new StarField(20, 0.4, 80, true));
