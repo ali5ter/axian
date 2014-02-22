@@ -1,4 +1,4 @@
-= ☄  A•X•I•A•N ☄ 
+=☄ A•X•I•A•N☄ 
 
 Something akin to Namco's 1980s Galaxian arcade game.
 
