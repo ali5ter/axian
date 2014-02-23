@@ -55,6 +55,45 @@ var SpriteSheet = new function() { // singleton
 
 /* ---------------------------------------------------------------------------
  *
+ * @class Sprite
+ * Definition of a series of one or many images from the sprite-sheet that
+ * create a controllable object on a game board.
+ *
+ */
+
+var Sprite = function() {
+};
+
+// @method setup
+// Load the sprite description and properties
+// @param sprite string name of the sprite
+// @param props property object
+Sprite.prototype.setup = function(sprite, props) {
+    this.sprite = sprite;
+    this.merge(props);
+    this.frame = this.frame || 0;
+    this.w = SpriteSheet.map[sprite].w;
+    this.h = SpriteSheet.map[sprite].h;
+};
+
+// @method merge
+// Merge the property object with the sprite properties
+// @param props property object
+Sprite.prototype.merge = function(props) {
+    if (props) {
+        for (var prop in props) this[prop] = props[prop];
+    };
+};
+
+// @method draw
+// Draw sprite to a canvas context
+// @param ctx canvas context
+Sprite.prototype.draw = function(ctx) {
+    SpriteSheet.draw(ctx, this.sprite, this.x, this.y, this.frame);
+};
+
+/* ---------------------------------------------------------------------------
+ *
  * @class TitleScreen
  *
  */

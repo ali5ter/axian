@@ -69,6 +69,10 @@ var sprites = {
         flag: { sx:272, sy:80, w:14, h:22, frames:0 }
     };
 
+var enemies = {
+    basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100 },
+};
+
 var StarField = function(speed, opacity, numStars, clear) {
 
     var stars = document.createElement('canvas'); // offscreen canvas
@@ -120,18 +124,10 @@ var StarField = function(speed, opacity, numStars, clear) {
 };
 
 var PlayerShip = function() {
-    this.w = SpriteSheet.map.ship.w;
-    this.h = SpriteSheet.map.ship.h;
+    this.setup('ship', { vx:0, frame:1, reloadTime:0.25, maxVel:200 });
     this.x = Game.width/2 - this.w/2;
     this.y = Game.height - 30 - this.h;
-    this.vx = 0;
-    this.maxVel = 200;
-    this.reloadTime = 0.25;
     this.reload = this.reloadTime;
-
-    this.draw = function(ctx) {
-        SpriteSheet.draw(ctx, 'ship', this.x, this.y, this.reload < 0 ? 1 : 0);
-    };
 
     this.step = function(dt) {
         if (Game.keys.left) this.vx = -this.maxVel;
@@ -145,6 +141,7 @@ var PlayerShip = function() {
 
         // TODO: Perhaps reload when missile off screen or collides
         this.reload -= dt;
+        this.frame = this.reload < 0 ? 1 : 0;
         if (Game.keys.fire && this.reload < 0) {
             Game.keys.fire = false;
             this.reload = this.reloadTime;
@@ -153,22 +150,21 @@ var PlayerShip = function() {
     };
 };
 
+PlayerShip.prototype = new Sprite();
+
 var PlayerMissile = function(x, y) {
-    this.w = SpriteSheet.map.shipMissile.w;
-    this.h = SpriteSheet.map.shipMissile.h;
+    this.setup('shipMissile', { vy:-700 });
     this.x = x - this.w/2;
     this.y = y - this.h;
-    this.vy = -700;
 };
+
+PlayerMissile.prototype = new Sprite();
 
 PlayerMissile.prototype.step = function(dt) {
     this.y += this.vy * dt;
     if (this.y < - this.h) { this.board.remove(this); }
 };
 
-PlayerMissile.prototype.draw = function(ctx) {
-    SpriteSheet.draw(ctx, 'shipMissile', this.x, this.y);
-};
 
 var Lives = function() {
     this.w = SpriteSheet.map.life.w;
@@ -184,9 +180,43 @@ var Lives = function() {
     };
 
     this.step = function(dt) {
-        //TODO: anything to do?
+        //TODO: reduce remiaining when ship dies
     };
 
+};
+
+var Enemy = function(blueprint, override) {
+    this.merge(this.baseParms);
+    this.setup(blueprint.sprite, blueprint);
+    this.merge(override);
+};
+
+Enemy.prototype = new Sprite();
+
+Enemy.prototype.baseParms = { A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0, t:0 };
+
+Enemy.prototype.step = function(dt) {
+    // vx = A + B * sin(C * t + D)
+    // A = constant horizonal velocity
+    // B = strength of horizonal sinusoidal velocity
+    // C = period of horizonal sinusoidal velocity
+    // D = time shift of horizonal sinusoidal velocity
+    //
+    // vy = E + F * sin(G * t + H)
+    // E = constant vertical velocity
+    // F = strength of vertical sinusoidal velocity
+    // G = period of vertical sinusoidal velocity
+    // H = time shift of vertical sinusoidal velocity
+    this.t += dt;
+    this.vx = this.A + this.B * Math.sin(this.C * this.t + this.D);
+    this.vy = this.E + this.F * Math.sin(this.G * this.t + this.H);
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    if (this.y > Game.height ||
+        this.x < -this.w ||
+        this.x > Game.width) {
+        this.board.remove(this);
+    }
 };
 
 var startGame = function() {
@@ -198,10 +228,11 @@ var startGame = function() {
 
 var playGame = function() {
     var board = new GameBoard();
-
+    board.add(new Enemy(enemies.basic));
+    board.add(new Enemy(enemies.basic, { x:50, C:10 }));
     board.add(new PlayerShip());
-
     Game.setBoard(3, board);
+
     Game.setBoard(4, new Lives(2));
 };
 
