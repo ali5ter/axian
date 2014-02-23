@@ -1,54 +1,17 @@
 /*
-   game.js
+
+   @file game.js
+   Axian game
+   Based on code from Pascal Retting's excellent book, 'Professional HTML5
+   Mobile Game Development'
+
 */
 
-var Game = new function() { // singleton
-
-    var KEYS = { 37:'left', 39:'right', 32:'fire' },
-        boards = [];
-    this.keys = {};
-
-    this.init = function(canvasId, spriteData, callback) {
-        this.canvas = document.getElementById(canvasId);
-        this.width = this.canvas.width;
-        this.height = this.canvas.height;
-        this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
-        if (!this.ctx) { return alert('No canvas available with this browser'); }
-        this.setupInput();
-        this.loop();
-        SpriteSheet.load(spriteData, callback);
-    };
-
-    this.setupInput = function() {
-        window.addEventListener('keydown', function(e) {
-            if (KEYS[e.keyCode]) {
-                Game.keys[KEYS[e.keyCode]] = true;
-                e.preventDefault();
-            }
-        }, false);
-        window.addEventListener('keyup', function(e) {
-            if (KEYS[e.keyCode]) {
-                Game.keys[KEYS[e.keyCode]] = false;
-                e.preventDefault();
-            }
-        }, false);
-    };
-
-    this.loop = function() {
-        var dt = 30/1000,   // 30 milliseconds
-            i = 0,
-            len = boards.length;
-        for (i=0; i<len; i++) {
-            if (boards[i]) {
-                boards[i].step(dt);
-                boards[i] && boards[i].draw(Game.ctx);
-            }
-        }
-        setTimeout(Game.loop, 30);
-    };
-
-    this.setBoard = function(zIndex, board) { boards[zIndex] = board; };
-}();
+var OBJECT_PLAYER = 1,
+    OBJECT_PLAYER_PROJECTILE = 2,
+    OBJECT_ENEMY =4,
+    OBJECT_ENEMY_PROJECTILE = 8,
+    OBJECT_POWERUP = 16;
 
 var sprites = {
         ship: { sx:238, sy:62, w:26, h:40, frames:1 },
@@ -73,6 +36,87 @@ var enemies = {
     basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100 },
 };
 
+/* ---------------------------------------------------------------------------
+ *
+ * @class Game
+ * Main class to run this game
+ *
+ */
+
+var Game = new function() { // singleton
+
+    var KEYS = { 37:'left', 39:'right', 32:'fire' },
+        boards = [];    // list of board layers to render on the canvas
+    this.keys = {};     // object containing key button status
+
+    // @method init
+    // Set up canvas, key bindings, load sprite sheet and start animation loop
+    // @param canvasId canvas id attribute string value
+    // @param spriteData Array of mapping objects
+    // @param callback once sprite sheet image has loaded
+    this.init = function(canvasId, spriteData, callback) {
+        this.canvas = document.getElementById(canvasId);
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
+        if (!this.ctx) { return alert('No canvas available with this browser'); }
+        this.setupInput();
+        this.loop();
+        SpriteSheet.load(spriteData, callback);
+    };
+
+    // @method setupInput
+    // Record keydown/keyup events when the correct keys pressed
+    this.setupInput = function() {
+        window.addEventListener('keydown', function(e) {
+            if (KEYS[e.keyCode]) {
+                Game.keys[KEYS[e.keyCode]] = true;
+                e.preventDefault();
+            }
+        }, false);
+        window.addEventListener('keyup', function(e) {
+            if (KEYS[e.keyCode]) {
+                Game.keys[KEYS[e.keyCode]] = false;
+                e.preventDefault();
+            }
+        }, false);
+    };
+
+    // @method loop
+    // Main animation loop
+    this.loop = function() {
+        var dt = 30/1000,   // 30 milliseconds
+            i = 0,
+            len = boards.length;
+        for (i=0; i<len; i++) {
+            if (boards[i]) {
+                boards[i].step(dt);
+                boards[i] && boards[i].draw(Game.ctx);
+            }
+        }
+        setTimeout(Game.loop, 30);
+    };
+
+    // @method setBoard
+    // Add a board to the game board object
+    // @param zIndex index of where the board sits in the stack
+    // @param board the board object that should contain at least a draw and
+    //        step method
+    this.setBoard = function(zIndex, board) { boards[zIndex] = board; };
+}();
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class Starfield
+ * A board to render a star field. This creates an off screen canvas of
+ * randomly drawn rectangles which will scroll down the main game canvas
+ * @param speed rate of downward scroll
+ * @param opacity of canvas objects
+ * @param numStars number of rectangles drawn on the canvas
+ * @param clear boolean indicating non-transparent canvas
+ *
+ */
+
 var StarField = function(speed, opacity, numStars, clear) {
 
     var stars = document.createElement('canvas'); // offscreen canvas
@@ -96,6 +140,9 @@ var StarField = function(speed, opacity, numStars, clear) {
         starsCtx.fillRect(r(stars.width), r(stars.height), 2, 2);
     }
 
+    // @method draw
+    // Draw off-screen canvas to the game canvas context
+    // @param ctx canvas context
     this.draw = function(ctx) {
         var intOffset = Math.floor(offset);
         var remaining = stars.height - intOffset;
@@ -117,54 +164,22 @@ var StarField = function(speed, opacity, numStars, clear) {
         }
     };
 
+    // @method step
+    // Loop step method to update offset from which off-screen canvas should
+    // be draw onto the game canvas
+    // @param dt time since last loop
     this.step = function(dt) {
         offset += dt * speed;           // distance moved in loop step time
         offset = offset % stars.height; // adjust offset to canvas height
     };
 };
 
-var PlayerShip = function() {
-    this.setup('ship', { vx:0, frame:1, reloadTime:0.25, maxVel:200 });
-    this.x = Game.width/2 - this.w/2;
-    this.y = Game.height - 30 - this.h;
-    this.reload = this.reloadTime;
-
-    this.step = function(dt) {
-        if (Game.keys.left) this.vx = -this.maxVel;
-        else if (Game.keys.right) this.vx = this.maxVel;
-        else this.vx = 0;
-
-        this.x += this.vx * dt;
-
-        if (this.x < 0) this.x = 0;
-        else if(this.x > Game.width - this.w) this.x = Game.width - this.w;
-
-        // TODO: Perhaps reload when missile off screen or collides
-        this.reload -= dt;
-        this.frame = this.reload < 0 ? 1 : 0;
-        if (Game.keys.fire && this.reload < 0) {
-            Game.keys.fire = false;
-            this.reload = this.reloadTime;
-            this.board.add(new PlayerMissile(this.x + this.w/2, this.y));
-        }
-    };
-};
-
-PlayerShip.prototype = new Sprite();
-
-var PlayerMissile = function(x, y) {
-    this.setup('shipMissile', { vy:-700 });
-    this.x = x - this.w/2;
-    this.y = y - this.h;
-};
-
-PlayerMissile.prototype = new Sprite();
-
-PlayerMissile.prototype.step = function(dt) {
-    this.y += this.vy * dt;
-    if (this.y < - this.h) { this.board.remove(this); }
-};
-
+/* ---------------------------------------------------------------------------
+ *
+ * @class Lives
+ * A board to render remaining player ship lives
+ *
+ */
 
 var Lives = function() {
     this.w = SpriteSheet.map.life.w;
@@ -184,6 +199,74 @@ var Lives = function() {
     };
 
 };
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class PlayerShip
+ * The players ship sprite
+ *
+ */
+
+var PlayerShip = function() {
+    this.setup('ship', { vx:0, frame:1, reloadTime:0.25, maxVel:200 });
+    this.x = Game.width/2 - this.w/2;
+    this.y = Game.height - 30 - this.h;
+    this.reload = this.reloadTime;
+
+    // @method step
+    // Loop step method to update ship position based on key status and
+    // collision with edges of canvas. Also handles fire button binding to
+    // add a new missile sprite to the game board
+    // @param dt time since last loop
+    this.step = function(dt) {
+        if (Game.keys.left) this.vx = -this.maxVel;
+        else if (Game.keys.right) this.vx = this.maxVel;
+        else this.vx = 0;
+        this.x += this.vx * dt;
+        if (this.x < 0) this.x = 0;
+        else if(this.x > Game.width - this.w) this.x = Game.width - this.w;
+
+        // TODO: Perhaps reload when missile off screen or collides
+        this.reload -= dt;
+        this.frame = this.reload < 0 ? 1 : 0;
+        if (Game.keys.fire && this.reload < 0) {
+            Game.keys.fire = false;
+            this.reload = this.reloadTime;
+            this.board.add(new PlayerMissile(this.x + this.w/2, this.y));
+        }
+    };
+};
+
+PlayerShip.prototype = new Sprite();
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class PlayerMissile
+ * The players ship missile sprite
+ *
+ */
+
+var PlayerMissile = function(x, y) {
+    this.setup('shipMissile', { vy:-700 });
+    this.x = x - this.w/2;
+    this.y = y - this.h;
+};
+
+PlayerMissile.prototype = new Sprite();
+
+PlayerMissile.prototype.type = OBJECT_PLAYER;
+
+PlayerMissile.prototype.step = function(dt) {
+    this.y += this.vy * dt;
+    if (this.y < - this.h) { this.board.remove(this); }
+};
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class Enemy
+ * An enemy sprite
+ *
+ */
 
 var Enemy = function(blueprint, override) {
     this.merge(this.baseParms);
@@ -219,12 +302,18 @@ Enemy.prototype.step = function(dt) {
     }
 };
 
+/* ------------------------------------------------------------------------- */
+
+// Show star fields and title screen
+
 var startGame = function() {
     Game.setBoard(0, new StarField(20, 0.4, 80, true));
     Game.setBoard(1, new StarField(50, 0.6, 40));
     Game.setBoard(2, new StarField(100, 1.0, 10));
     Game.setBoard(3, new TitleScreen('Axian', 'Fire to start playing', playGame));
 };
+
+// Set up the game board and play
 
 var playGame = function() {
     var board = new GameBoard();
@@ -235,6 +324,8 @@ var playGame = function() {
 
     Game.setBoard(4, new Lives(2));
 };
+
+// Start the game once the page is loaded
 
 window.addEventListener('load', function() {
     Game.init('game', sprites, startGame);
