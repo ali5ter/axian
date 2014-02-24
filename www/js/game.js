@@ -33,7 +33,7 @@ var sprites = {
     };
 
 var enemies = {
-    basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100 },
+basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100, damage:10 },
 };
 
 /* ---------------------------------------------------------------------------
@@ -305,6 +305,11 @@ Enemy.prototype.step = function(dt) {
     this.vy = this.E + this.F * Math.sin(this.G * this.t + this.H);
     this.x += this.vx * dt;
     this.y += this.vy * dt;
+    var collision = this.board.collide(this, OBJECT_PLAYER);
+    if (collision) {
+        collision.hit(this.damage);
+        this.board.remove(this);
+    };
     if (this.y > Game.height ||
         this.x < -this.w ||
         this.x > Game.width) {
