@@ -14,26 +14,26 @@ var OBJECT_PLAYER = 1,
     OBJECT_POWERUP = 16;
 
 var sprites = {
-        ship: { sx:238, sy:62, w:26, h:40, frames:1 },
-        shipExplosion: { sx:0, sy:340, w:64, h:64, frames:3 },
-        shipMissile: { sx:238, sy:34, w:2, h:8, frames:0 },
-        alien1: { sx:0, sy:0, w:24, h:24, frames:2 },
-        alien1RollLeft: { sx:0, sy:24, w:24, h:24, frames:8 },
-        alien1RollRight: { sx:0, sy:48, w:24, h:24, frames:8 },
-        alien2: { sx:0, sy:72, w:24, h:24, frames:2 },
-        alien2RollLeft: { sx:0, sy:96, w:24, h:24, frames:8 },
-        alien2RollRight: { sx:0, sy:120, w:24, h:24, frames:8 },
-        alien3: { sx:0, sy:144, w:24, h:24, frames:0 },
-        alien3RollLeft: { sx:0, sy:168, w:24, h:24, frames:8 },
-        alien3RollRight: { sx:0, sy:192, w:24, h:24, frames:8 },
-        alienExplosion: { sx:0, sy:306, w:34, h:34, frames:3 },
-        alienMissile: { sx:242, sy:34, w:2, h:8, frames:0 },
-        life: { sx:322, sy:80, w:18, h:22, frames:0 },
-        flag: { sx:272, sy:80, w:14, h:22, frames:0 }
+        ship: { sx:238, sy:62, w:26, h:40, frames:2 },
+        shipExplosion: { sx:0, sy:340, w:64, h:64, frames:4 },
+        shipMissile: { sx:238, sy:34, w:2, h:8, frames:1 },
+        alien1: { sx:0, sy:0, w:24, h:24, frames:3, hold:10 },
+        alien1RollLeft: { sx:0, sy:24, w:24, h:24, frames:9 },
+        alien1RollRight: { sx:0, sy:48, w:24, h:24, frames:9 },
+        alien2: { sx:0, sy:72, w:24, h:24, frames:3 },
+        alien2RollLeft: { sx:0, sy:96, w:24, h:24, frames:9 },
+        alien2RollRight: { sx:0, sy:120, w:24, h:24, frames:9 },
+        alien3: { sx:0, sy:144, w:24, h:24, frames:1 },
+        alien3RollLeft: { sx:0, sy:168, w:24, h:24, frames:9 },
+        alien3RollRight: { sx:0, sy:192, w:24, h:24, frames:9 },
+        alienExplosion: { sx:0, sy:306, w:34, h:34, frames:4 },
+        alienMissile: { sx:242, sy:34, w:2, h:8, frames:1 },
+        life: { sx:322, sy:80, w:18, h:22, frames:1 },
+        flag: { sx:272, sy:80, w:14, h:22, frames:1 }
     };
 
 var enemies = {
-basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100, damage:10 },
+    basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100, damage:1, health:10, hold:20 },
 };
 
 /* ---------------------------------------------------------------------------
@@ -315,9 +315,39 @@ Enemy.prototype.step = function(dt) {
         this.x > Game.width) {
         this.board.remove(this);
     }
+    this.frame = Math.floor(this.subFrame++ / this.hold);
+    if (this.subFrame >= this.frames * this.hold) this.subFrame = 0;
 };
 
-/* ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ *
+ * @class Explosion
+ * An explosion sprite
+ * @param type object type of the sprite to explode
+ * @param cX center x coordinate
+ * @param cY center y coordinate
+ *
+ */
+
+var Explosion = function(type, cX, cY) {
+    if (type === OBJECT_PLAYER)  this.setup('shipExplosion', { hold:5 });
+    else this.setup('alienExplosion', { hold:3 });
+    this.type = type;
+    this.x = cX - this.w/2;
+    this.y = cY - this.h/2;
+};
+
+Explosion.prototype = new Sprite();
+
+Explosion.prototype.step = function(dt) {
+    this.frame = Math.floor(this.subFrame++ / this.hold);
+    if (this.subFrame >= this.frames * this.hold) {
+        this.board.remove(this);
+    }
+};
+
+
+/ *------------------------------------------------------------------------- */
 
 // Show star fields and title screen
 

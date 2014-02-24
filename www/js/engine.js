@@ -72,8 +72,12 @@ Sprite.prototype.setup = function(sprite, props) {
     this.sprite = sprite;
     this.merge(props);
     this.frame = this.frame || 0;
+    this.hold = this.hold || 0;
+    this.health = this.health || 0;
     this.w = SpriteSheet.map[sprite].w;
     this.h = SpriteSheet.map[sprite].h;
+    this.subFrame = 0;
+    this.frames = SpriteSheet.map[sprite].frames;
 };
 
 // @method merge
@@ -89,7 +93,12 @@ Sprite.prototype.merge = function(props) {
 // Default action when something collides with this sprite
 // @param damage amount of damage done
 Sprite.prototype.hit = function(damage) {
-    this.board.remove(this);
+    this.health -= damage;
+    if (this.health <=0) {
+        if (this.board.remove(this)) {
+            this.board.add(new Explosion(this.type, this.x + this.w/2, this.y + this.h/2));
+        }
+    }
 };
 
 // @method draw
@@ -161,9 +170,9 @@ var GameBoard = function() {
     // Marks an object for removal from the game board
     // @param obj game object that has at least a draw and step method
     this.remove = function(obj) {
-        var wasStillAlive = this.removed.indexOf(obj) != -1;
-        if (!wasStillAlive) this.removed.push(obj);
-        return wasStillAlive; // return false if objects already removed (aka dead)
+        var stillAlive = this.removed.indexOf(obj) == -1;
+        if (stillAlive) this.removed.push(obj);
+        return stillAlive;
     };
 
     // @method resetRemoved
