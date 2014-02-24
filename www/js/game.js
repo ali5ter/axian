@@ -239,6 +239,8 @@ var PlayerShip = function() {
 
 PlayerShip.prototype = new Sprite();
 
+PlayerShip.prototype.type = OBJECT_PLAYER;
+
 /* ---------------------------------------------------------------------------
  *
  * @class PlayerMissile
@@ -247,18 +249,24 @@ PlayerShip.prototype = new Sprite();
  */
 
 var PlayerMissile = function(x, y) {
-    this.setup('shipMissile', { vy:-700 });
+    this.setup('shipMissile', { vy:-700, damage:10 });
     this.x = x - this.w/2;
     this.y = y - this.h;
 };
 
 PlayerMissile.prototype = new Sprite();
 
-PlayerMissile.prototype.type = OBJECT_PLAYER;
+PlayerMissile.prototype.type = OBJECT_PLAYER_PROJECTILE;
 
 PlayerMissile.prototype.step = function(dt) {
     this.y += this.vy * dt;
-    if (this.y < - this.h) { this.board.remove(this); }
+    // return the first enemy sprit object this missile hits
+    var collision = this.board.collide(this, OBJECT_ENEMY);
+    if (collision) {
+        collision.hit(this.damage); // hit sprite deals with collision
+        this.board.remove(this);    // remove this missle
+    }
+    else if (this.y < - this.h) this.board.remove(this);
 };
 
 /* ---------------------------------------------------------------------------
@@ -275,6 +283,8 @@ var Enemy = function(blueprint, override) {
 };
 
 Enemy.prototype = new Sprite();
+
+Enemy.prototype.type = OBJECT_ENEMY;
 
 Enemy.prototype.baseParms = { A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0, t:0 };
 

@@ -85,6 +85,13 @@ Sprite.prototype.merge = function(props) {
     };
 };
 
+// @method hit
+// Default action when something collides with this sprite
+// @param damage amount of damage done
+Sprite.prototype.hit = function(damage) {
+    this.board.remove(this);
+};
+
 // @method draw
 // Draw sprite to a canvas context
 // @param ctx canvas context
@@ -95,11 +102,18 @@ Sprite.prototype.draw = function(ctx) {
 /* ---------------------------------------------------------------------------
  *
  * @class TitleScreen
+ * Simple board to show the title screen
+ * @param title game title text string
+ * @param title game subtitle text string, e.g. press fire to start
+ * @param callback when fire key pressed
  *
  */
 
 var TitleScreen = function(title, subtitle, callback) {
 
+    // @method draw
+    // Render title and subtitle on the canvas context
+    // @param ctx canvas context
     this.draw = function(ctx) {
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
@@ -110,6 +124,9 @@ var TitleScreen = function(title, subtitle, callback) {
         ctx.fillText(subtitle, Game.width/2, Game.height/2 + 40);
     };
 
+    // @method step
+    // Check if fire key pressed
+    // @param dt time since last loop
     this.step = function(dt) {
         if (Game.keys.fire && callback) callback();
     };
@@ -118,7 +135,7 @@ var TitleScreen = function(title, subtitle, callback) {
 /* ---------------------------------------------------------------------------
  *
  * @class GameBoard
- * Wrapper to draw images from a sprite-sheet image to a canvas context
+ * A board to draw images from a sprite-sheet image
  *
  */
 
@@ -145,7 +162,7 @@ var GameBoard = function() {
     // @param obj game object that has at least a draw and step method
     this.remove = function(obj) {
         var wasStillAlive = this.removed.indexOf(obj) != -1;
-        if (wasStillAlive) this.removed.push(obj);
+        if (!wasStillAlive) this.removed.push(obj);
         return wasStillAlive; // return false if objects already removed (aka dead)
     };
 
