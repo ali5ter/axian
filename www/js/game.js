@@ -7,11 +7,15 @@
 
 */
 
+// Sprite object identifiers
+
 var OBJECT_PLAYER = 1,
     OBJECT_PLAYER_PROJECTILE = 2,
     OBJECT_ENEMY =4,
     OBJECT_ENEMY_PROJECTILE = 8,
     OBJECT_POWERUP = 16;
+
+// Sprite object mappings
 
 var sprites = {
         ship: { sx:238, sy:62, w:26, h:40, frames:2 },
@@ -23,17 +27,31 @@ var sprites = {
         alien2: { sx:0, sy:72, w:24, h:24, frames:3 },
         alien2RollLeft: { sx:0, sy:96, w:24, h:24, frames:9 },
         alien2RollRight: { sx:0, sy:120, w:24, h:24, frames:9 },
-        alien3: { sx:0, sy:144, w:24, h:24, frames:1 },
+        alien3: { sx:0, sy:144, w:24, h:24, frames:3 },
         alien3RollLeft: { sx:0, sy:168, w:24, h:24, frames:9 },
         alien3RollRight: { sx:0, sy:192, w:24, h:24, frames:9 },
+        alien4: { sx:0, sy:216, w:24, h:24, frames:0 },
+        alien4RollLeft: { sx:0, sy:240, w:24, h:24, frames:12 },
+        alien4RollRight: { sx:0, sy:264, w:24, h:24, frames:12 },
         alienExplosion: { sx:0, sy:306, w:34, h:34, frames:4 },
         alienMissile: { sx:242, sy:34, w:2, h:8, frames:1 },
         life: { sx:322, sy:80, w:18, h:22, frames:1 },
         flag: { sx:272, sy:80, w:14, h:22, frames:1 }
     };
 
+// Enemy behaviours
+
 var enemies = {
-    basic: { x:100, y:-50, sprite:'alien1', B:100, C:2, E:100, damage:1, health:10, hold:20 },
+    basic:  { x:0, y:-50, sprite:'alien1', damage:1, health:10, hold:20,
+              E:100 },
+    ltr:    { x:0, y:-100, sprite:'alien1', damage:1, health:10, hold:20,
+              B:200, C:1, E:200 },
+    circle: { x:400, y:-50, sprite:'alien4', damage:1, health:10, hold:20,
+              A:0, B:-200, C:1, E:20, F:200, G:1, H:Math.PI/2 },
+    wiggle: { x:100, y:-50, sprite:'alien3', damage:1, health:20, hold:20,
+              B:100, C:4, E:100 },
+    step:   { x:0, y:-50, sprite:'alien2', damage:1, health:10, hold:20,
+              B:100, C:1.5, E:60 },
 };
 
 /* ---------------------------------------------------------------------------
@@ -310,11 +328,9 @@ Enemy.prototype.step = function(dt) {
         collision.hit(this.damage);
         this.board.remove(this);
     };
-    if (this.y > Game.height ||
-        this.x < -this.w ||
-        this.x > Game.width) {
-        this.board.remove(this);
-    }
+    if (this.y > Game.height) this.y = 0;
+    else if (this.x < -this.w) this.x = Game.width;
+    else if (this.x > Game.width) this.x = -this.w;
     this.frame = Math.floor(this.subFrame++ / this.hold);
     if (this.subFrame >= this.frames * this.hold) this.subFrame = 0;
 };
@@ -355,7 +371,7 @@ var startGame = function() {
     Game.setBoard(0, new StarField(20, 0.4, 80, true));
     Game.setBoard(1, new StarField(50, 0.6, 40));
     Game.setBoard(2, new StarField(100, 1.0, 10));
-    Game.setBoard(3, new TitleScreen('Axian', 'Fire to start playing', playGame));
+    Game.setBoard(3, new TitleScreen('Axian', 'Press fire to start', playGame));
 };
 
 // Set up the game board and play
@@ -363,7 +379,10 @@ var startGame = function() {
 var playGame = function() {
     var board = new GameBoard();
     board.add(new Enemy(enemies.basic));
-    board.add(new Enemy(enemies.basic, { x:50, C:10 }));
+    board.add(new Enemy(enemies.ltr, { x:50 }));
+    board.add(new Enemy(enemies.circle, { x:100 }));
+    board.add(new Enemy(enemies.wiggle, { x:150 }));
+    board.add(new Enemy(enemies.step, { x:200 }));
     board.add(new PlayerShip());
     Game.setBoard(3, board);
 
