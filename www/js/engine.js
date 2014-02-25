@@ -86,7 +86,7 @@ Sprite.prototype.setup = function(sprite, props) {
 Sprite.prototype.merge = function(props) {
     if (props) {
         for (var prop in props) this[prop] = props[prop];
-    };
+    }
 };
 
 // @method hit
@@ -259,4 +259,60 @@ var GameBoard = function() {
     this.draw = function(ctx) {
         this.iterate('draw', ctx);
     };
+};
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class Level
+ * Parses level data to stage the generation of enemies on teh game board
+ *
+ */
+
+var Level = function(levelData, callback) {
+    this.levelData = [];
+    for (var i = 0; i <levelData.length; i++) {
+        this.levelData.push(Object.create(levelData[i]));
+    }
+    this.t = 0;
+    this.callback = callback;
+};
+
+// @method step
+// Add enemy sprites as they are defined to appear in the level data
+// @param dt time since last loop
+Level.prototype.step = function(dt) {
+    var _i = 0,
+        _remove = [],
+        _cObj = null;
+    this.t += dt * 1000;    // time offset
+
+    // var level1 = [
+    //    Start   End     Gap     Type        Override
+    //    [0,     4000,   500,    'step',     { x: 100 } ],
+    while ((_cObj = this.levelData[_i]) && (_cObj[0] < this.t + 2000)) {
+        if (this.t > _cObj[1]) {
+            _remove.push(_cObj); // remove if past the end
+        }
+        else if (_cObj[0] < this.t) {
+            this.board.add(new Enemy(enemies[_cObj[3]], _cObj[4])); // add sprite
+            _cObj[0] += _cObj[2];   // increment start by gap
+        }
+        _i++;
+    }
+
+    // Remove past objects
+    for (var i = 0; i < _remove.length; i++) {
+        _i = this.levelData.splice(_i, 1);
+    }
+
+    // Check if level done
+    if (this.levelData.length === 0 && this.board.cnt[OBJECT_ENEMY] === 0) {
+        if (this.callback) this.callback();
+    }
+};
+
+// @method draw
+// Dummy method
+// @param ctx canvas context
+Level.prototype.draw = function(ctx) {
 };

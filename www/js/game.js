@@ -54,6 +54,20 @@ var enemies = {
               B:100, C:1.5, E:60 },
 };
 
+// Level definitions
+
+var level1 = [
+//  Start   End     Gap     Type        Override
+    [0,     4000,   500,    'step' ],
+    [6000,  13000,  800,    'ltr' ],
+    [12000, 16000,  400,    'circle' ],
+    [18200, 20000,  500,    'straight', { x: 150 } ],
+    [18200, 20000,  500,    'straight', { x: 100 } ],
+    [18400, 20000,  500,    'straight', { x: 200 } ],
+    [22000, 25000,  400,    'wiggle',   { x: 300 } ],
+    [22000, 25000,  400,    'wiggle',   { x: 220 } ],
+];
+
 /* ---------------------------------------------------------------------------
  *
  * @class Game
@@ -253,6 +267,13 @@ var PlayerShip = function() {
             this.board.add(new PlayerMissile(this.x + this.w/2, this.y));
         }
     };
+
+    // @method hit
+    // Override action when something collides with this sprite
+    // @param damage amount of damage done
+    this.hit = function(damage) {
+        if (this.board.remove(this)) loseGame();
+    };
 };
 
 PlayerShip.prototype = new Sprite();
@@ -327,7 +348,7 @@ Enemy.prototype.step = function(dt) {
     if (collision) {
         collision.hit(this.damage);
         this.board.remove(this);
-    };
+    }
     if (this.y > Game.height) this.y = 0;
     else if (this.x < -this.w) this.x = Game.width;
     else if (this.x > Game.width) this.x = -this.w;
@@ -363,7 +384,7 @@ Explosion.prototype.step = function(dt) {
 };
 
 
-/ *------------------------------------------------------------------------- */
+/*------------------------------------------------------------------------- */
 
 // Show star fields and title screen
 
@@ -378,16 +399,24 @@ var startGame = function() {
 
 var playGame = function() {
     var board = new GameBoard();
-    board.add(new Enemy(enemies.basic));
-    board.add(new Enemy(enemies.ltr, { x:50 }));
-    board.add(new Enemy(enemies.circle, { x:100 }));
-    board.add(new Enemy(enemies.wiggle, { x:150 }));
-    board.add(new Enemy(enemies.step, { x:200 }));
     board.add(new PlayerShip());
+    board.add(new Level(level1, winGame));
     Game.setBoard(3, board);
-
     Game.setBoard(4, new Lives(2));
+    //Game.setBoard(4, new Score());
 };
+
+// React to a win
+
+var winGame = function() {
+    Game.setBoard(3, new TitleScreen('Axian', 'Press fire to play again', playGame));
+}
+
+// React to a loss
+
+var loseGame = function() {
+    Game.setBoard(3, new TitleScreen('Axian', 'Press fire to play again', playGame));
+}
 
 // Start the game once the page is loaded
 
