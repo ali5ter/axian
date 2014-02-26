@@ -7,6 +7,10 @@
 
 */
 
+var PI = Math.PI,
+    TAU = PI*2,
+    HPI = PI/2;
+
 // Sprite object identifiers
 
 var OBJECT_PLAYER = 1,
@@ -36,36 +40,88 @@ var sprites = {
         alienExplosion: { sx:0, sy:306, w:34, h:34, frames:4 },
         alienMissile: { sx:242, sy:34, w:2, h:8, frames:1 },
         life: { sx:322, sy:80, w:18, h:22, frames:1 },
-        flag: { sx:272, sy:80, w:14, h:22, frames:1 }
+        flag: { sx:306, sy:80, w:14, h:22, frames:1 }
     };
 
 // Enemy behaviours
 
 var enemies = {
-    basic:  { x:0, y:-50, sprite:'alien1', damage:1, health:10, hold:20,
-              E:100 },
-    ltr:    { x:0, y:-100, sprite:'alien1', damage:1, health:10, hold:20,
-              B:200, C:1, E:200 },
-    circle: { x:400, y:-50, sprite:'alien4', damage:1, health:10, hold:20,
-              A:0, B:-200, C:1, E:20, F:200, G:1, H:Math.PI/2 },
-    wiggle: { x:100, y:-50, sprite:'alien3', damage:1, health:20, hold:20,
-              B:100, C:4, E:100 },
-    step:   { x:0, y:-50, sprite:'alien2', damage:1, health:10, hold:20,
-              B:100, C:1.5, E:60 },
+    straight:   { x:0, y:-50, sprite:'alien1', damage:1, health:10, hold:20,
+                  E:100 },
+    ltr:        { x:0, y:-100, sprite:'alien1', damage:1, health:10, hold:20,
+                  B:200, C:1, E:200 },
+    circle:     { x:400, y:-50, sprite:'alien4', damage:1, health:10, hold:20,
+                  A:0, B:-200, C:1, E:20, F:200, G:1, H:HPI },
+    wiggle:     { x:100, y:-50, sprite:'alien3', damage:1, health:20, hold:20,
+                  B:100, C:4, E:100 },
+    step:       { x:0, y:-50, sprite:'alien2', damage:1, health:10, hold:20,
+                  B:100, C:1.5, E:60 },
+    aaa:        { x:0, y:0, sprite:'alien1', damage:1, health:10, hold:20,
+                  A:0, B:22, C:1, D:HPI, E:5, F:0, G:0, H:0 },
+    bbb:        { x:0, y:0, sprite:'alien2', damage:1, health:10, hold:20,
+                  A:0, B:22, C:1, D:HPI, E:5, F:0, G:0, H:0 },
+    ccc:        { x:0, y:0, sprite:'alien3', damage:1, health:10, hold:20,
+                  A:0, B:22, C:1, D:HPI, E:5, F:0, G:0, H:0 },
+    ddd:        { x:0, y:0, sprite:'alien4', damage:1, health:10, hold:20,
+                  A:0, B:22, C:1, D:HPI, E:5, F:0, G:0, H:0 },
 };
 
 // Level definitions
 
+var xo = 25, w = 30, yo = 130, h = w;
+
 var level1 = [
 //  Start   End     Gap     Type        Override
-    [0,     4000,   500,    'step' ],
-    [6000,  13000,  800,    'ltr' ],
-    [12000, 16000,  400,    'circle' ],
-    [18200, 20000,  500,    'straight', { x: 150 } ],
-    [18200, 20000,  500,    'straight', { x: 100 } ],
-    [18400, 20000,  500,    'straight', { x: 200 } ],
-    [22000, 25000,  400,    'wiggle',   { x: 300 } ],
-    [22000, 25000,  400,    'wiggle',   { x: 220 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 0, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 1, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 2, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 3, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 4, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 5, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 6, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 7, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 8, y: yo - h * 0 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 0, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 1, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 2, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 3, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 4, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 5, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 6, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 7, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 8, y: yo - h * 1 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 0, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 1, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 2, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 3, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 4, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 5, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 6, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 7, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'aaa',      { x: xo + w * 8, y: yo - h * 2 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 1, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 2, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 3, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 4, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 5, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 6, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'bbb',      { x: xo + w * 7, y: yo - h * 3 } ],
+    [0,     4000,   4000,    'ccc',      { x: xo + w * 2, y: yo - h * 4 } ],
+    [0,     4000,   4000,    'ccc',      { x: xo + w * 3, y: yo - h * 4 } ],
+    [0,     4000,   4000,    'ccc',      { x: xo + w * 4, y: yo - h * 4 } ],
+    [0,     4000,   4000,    'ccc',      { x: xo + w * 5, y: yo - h * 4 } ],
+    [0,     4000,   4000,    'ccc',      { x: xo + w * 6, y: yo - h * 4 } ],
+    [0,     4000,   4000,    'ddd',      { x: xo + w * 3, y: yo - h * 5 } ],
+    [0,     4000,   4000,    'ddd',      { x: xo + w * 4, y: yo - h * 5 } ],
+    [0,     4000,   4000,    'ddd',      { x: xo + w * 5, y: yo - h * 5 } ],
+    //[0,     4000,   500,    'step' ],
+    //[6000,  13000,  800,    'ltr' ],
+    //[12000, 16000,  400,    'circle' ],
+    //[18200, 20000,  500,    'straight', { x: 150 } ],
+    //[18200, 20000,  500,    'straight', { x: 100 } ],
+    //[18400, 20000,  500,    'straight', { x: 200 } ],
+    //[22000, 25000,  400,    'wiggle',   { x: 300 } ],
+    //[22000, 25000,  400,    'wiggle',   { x: 220 } ],
 ];
 
 /* ---------------------------------------------------------------------------
@@ -80,6 +136,10 @@ var Game = new function() { // singleton
     var KEYS = { 37:'left', 39:'right', 32:'fire' },
         boards = [];    // list of board layers to render on the canvas
     this.keys = {};     // object containing key button status
+    this.points = 0;
+    this.highscore = 0; // TODO: Store in local storage
+    this.lives = 0;
+    this.levels = 1;
 
     // @method init
     // Set up canvas, key bindings, load sprite sheet and start animation loop
@@ -130,11 +190,16 @@ var Game = new function() { // singleton
     };
 
     // @method setBoard
-    // Add a board to the game board object
+    // Add a board to the game board array
     // @param zIndex index of where the board sits in the stack
     // @param board the board object that should contain at least a draw and
     //        step method
     this.setBoard = function(zIndex, board) { boards[zIndex] = board; };
+
+    // @Method removeBoard
+    // Remove a board from the game board array
+    // @param zIndex index of where the board sits in the stack
+    this.removeBoard = function(zIndex) { boards.splice(zIndex, 1); };
 }();
 
 /* ---------------------------------------------------------------------------
@@ -216,18 +281,20 @@ var StarField = function(speed, opacity, numStars, clear) {
 var Lives = function() {
     this.w = SpriteSheet.map.life.w;
     this.h = SpriteSheet.map.life.h;
-    this.x = 0;
-    this.y = Game.height - this.h;
-    this.remaining = 2;
+    this.x = 3;
+    this.y = Game.height - this.h - 5;
+    this.wave = 4;  // 1 wave = 4 levels
 
     this.draw = function(ctx) {
-        for (var i = 0; i < this.remaining; i++) {
-            SpriteSheet.draw(ctx, 'life', (this.w+8)*i, this.y, 0);
+        for (var i = 0; i < Game.lives-1; i++) {
+            SpriteSheet.draw(ctx, 'life', this.x+(this.w+8)*i, this.y, 0);
+        }
+        for (i = 0; i < Math.ceil(Game.levels/this.wave)+1; i++) {
+            SpriteSheet.draw(ctx, 'flag', Game.width+8-(this.w+8)*i, this.y, 0);
         }
     };
 
     this.step = function(dt) {
-        //TODO: reduce remiaining when ship dies
     };
 
 };
@@ -272,7 +339,20 @@ var PlayerShip = function() {
     // Override action when something collides with this sprite
     // @param damage amount of damage done
     this.hit = function(damage) {
-        if (this.board.remove(this)) loseGame();
+        console.log('ship was hit');
+        if (this.board.remove(this)) {
+            console.log('removed ship from board');
+            Game.lives -= 1;
+            this.board.add(new Explosion(this.type, this.x + this.w/2,
+                this.y + this.h/2, this.newShip));
+        }
+    };
+
+    // @method newShip
+    // Check that we have enough lives for a new ship
+    this.newShip = function() {
+        if (Game.lives === 0) loseGame();
+        else this.board.add(new PlayerShip());
     };
 };
 
@@ -325,7 +405,8 @@ Enemy.prototype = new Sprite();
 
 Enemy.prototype.type = OBJECT_ENEMY;
 
-Enemy.prototype.baseParms = { A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0, t:0 };
+Enemy.prototype.baseParms = { A:0, B:0, C:0, D:0, E:0, F:0, G:0, H:0, t:0,
+    firePercentage: 0.001, reloadTime: 5, reload: 0 };
 
 Enemy.prototype.step = function(dt) {
     // vx = A + B * sin(C * t + D)
@@ -345,15 +426,51 @@ Enemy.prototype.step = function(dt) {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     var collision = this.board.collide(this, OBJECT_PLAYER);
-    if (collision) {
-        collision.hit(this.damage);
-        this.board.remove(this);
+    if (collision) collision.hit(this.damage);
+    // fire missile
+    if (this.reload <= 0 && Math.random() < this.firePercentage) {
+        this.reload = this.reloadTime;
+        if (this.missiles == 2) {
+            this.board.add(new EnemyMissile(this.x+this.w-2, this.y+this.h/2));
+            this.board.add(new EnemyMissile(this.x+2, this.y+this.h/2));
+        }
+        else this.board.add(new EnemyMissile(this.x+this.w/2, this.y+this.h/2));
     }
-    if (this.y > Game.height) this.y = 0;
-    else if (this.x < -this.w) this.x = Game.width;
-    else if (this.x > Game.width) this.x = -this.w;
+    this.reload -= dt;
+    // edge detection
+    if (this.y > Game.height) this.y = 0;           // wrap bottom to top
+    else if (this.x < -this.w) this.x = Game.width; // wrap left to right
+    else if (this.x > Game.width) this.x = -this.w; // wrap right to left
+    // cycle the sprite frames
     this.frame = Math.floor(this.subFrame++ / this.hold);
     if (this.subFrame >= this.frames * this.hold) this.subFrame = 0;
+};
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class EnemyMissile
+ * An enemy ship missile sprite
+ *
+ */
+
+var EnemyMissile = function(x, y) {
+    this.setup('alienMissile', { vy:200, damage:10 });
+    this.x = x - this.w/2;
+    this.y = y - this.h;
+};
+
+EnemyMissile.prototype = new Sprite();
+
+EnemyMissile.prototype.type = OBJECT_ENEMY_PROJECTILE;
+
+EnemyMissile.prototype.step = function(dt) {
+    this.y += this.vy * dt;
+    var collision = this.board.collide(this, OBJECT_PLAYER);
+    if (collision) {
+        collision.hit(this.damage); // hit sprite deals with collision
+        this.board.remove(this);    // remove this missle
+    }
+    else if (this.y > Game.height) this.board.remove(this);
 };
 
 /* ---------------------------------------------------------------------------
@@ -363,15 +480,17 @@ Enemy.prototype.step = function(dt) {
  * @param type object type of the sprite to explode
  * @param cX center x coordinate
  * @param cY center y coordinate
+ * @param callback when explosion ended
  *
  */
 
-var Explosion = function(type, cX, cY) {
+var Explosion = function(type, cX, cY, callback) {
     if (type === OBJECT_PLAYER)  this.setup('shipExplosion', { hold:5 });
     else this.setup('alienExplosion', { hold:3 });
     this.type = type;
     this.x = cX - this.w/2;
     this.y = cY - this.h/2;
+    this.callback = callback;
 };
 
 Explosion.prototype = new Sprite();
@@ -380,6 +499,7 @@ Explosion.prototype.step = function(dt) {
     this.frame = Math.floor(this.subFrame++ / this.hold);
     if (this.subFrame >= this.frames * this.hold) {
         this.board.remove(this);
+        if (this.callback) this.callback();
     }
 };
 
@@ -398,23 +518,29 @@ var startGame = function() {
 // Set up the game board and play
 
 var playGame = function() {
+    Game.points = 0;
+    Game.lives = 3;
     var board = new GameBoard();
     board.add(new PlayerShip());
     board.add(new Level(level1, winGame));
     Game.setBoard(3, board);
     Game.setBoard(4, new Lives(2));
-    //Game.setBoard(4, new Score());
+    Game.setBoard(5, new GamePoints());
 };
 
 // React to a win
 
 var winGame = function() {
+    Game.removeBoard(4);
+    Game.removeBoard(3);
     Game.setBoard(3, new TitleScreen('Axian', 'Press fire to play again', playGame));
 }
 
 // React to a loss
 
 var loseGame = function() {
+    Game.removeBoard(4);
+    Game.removeBoard(3);
     Game.setBoard(3, new TitleScreen('Axian', 'Press fire to play again', playGame));
 }
 

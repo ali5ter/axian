@@ -96,6 +96,7 @@ Sprite.prototype.hit = function(damage) {
     this.health -= damage;
     if (this.health <=0) {
         if (this.board.remove(this)) {
+            Game.points += this.points || 100;
             this.board.add(new Explosion(this.type, this.x + this.w/2, this.y + this.h/2));
         }
     }
@@ -138,6 +139,43 @@ var TitleScreen = function(title, subtitle, callback) {
     // @param dt time since last loop
     this.step = function(dt) {
         if (Game.keys.fire && callback) callback();
+    };
+};
+
+/* ---------------------------------------------------------------------------
+ *
+ * @class GamePoints
+ * Simple board to display the 1 up score and high score
+ *
+ */
+
+var GamePoints = function() {
+
+    // @method draw
+    // Render scores to the canvas context
+    // @param ctx canvas context
+    this.draw = function(ctx) {
+        var text = ''+ Game.points; // to string
+        ctx.save(); // ?
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.font = '14px joystix';
+        ctx.fillText('Hi score', Game.width/2, 14);
+        ctx.textAlign = 'left';
+        ctx.fillText('1up', 0, 14);
+        ctx.fillStyle = '#c02b0e';
+        ctx.textAlign = 'center';
+        ctx.fillText(Game.highscore, Game.width/2, 28);
+        ctx.textAlign = 'left';
+        ctx.fillText(Game.points, 0, 28);
+        ctx.restore(); // ?
+    };
+
+    // @method step
+    // Dummy step method
+    // @param dt time since last loop
+    this.step = function(dt) {
+        if (Game.points > Game.highscore) Game.highscore = Game.points;
     };
 };
 
@@ -213,7 +251,7 @@ var GameBoard = function() {
     };
 
     // @method overlap
-    // Check is two objects overlap
+    // Check is two objects, not already marked for removal, overlap
     // @param o1 an object with x,y and h,w properties
     // @param o2 an object with x,y and h,w properties
     this.overlap = function(o1, o2) {
@@ -236,7 +274,8 @@ var GameBoard = function() {
     this.collide = function(obj, type) {
         return this.detect(function() {
             if (obj != this) {
-                var col = (!type || this.type & type) && board.overlap(obj, this);
+                var col = (!type || this.type & type) &&        // a type we want?
+                    board.overlap(obj, this);                   // overlapping?
                 return col ? this : false;
             }
         });
@@ -302,11 +341,12 @@ Level.prototype.step = function(dt) {
 
     // Remove past objects
     for (var i = 0; i < _remove.length; i++) {
-        _i = this.levelData.splice(_i, 1);
+        _i = this.levelData.indexOf(_remove[i]);
+        if(_i != -1) this.levelData.splice(_i, 1);
     }
 
     // Check if level done
-    if (this.levelData.length === 0 && this.board.cnt[OBJECT_ENEMY] === 0) {
+    if (this.levelData.length === 0 && this.board.count[OBJECT_ENEMY] === 0) {
         if (this.callback) this.callback();
     }
 };
