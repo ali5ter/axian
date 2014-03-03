@@ -144,6 +144,55 @@ var TitleScreen = function(title, subtitle, callback) {
 
 /* ---------------------------------------------------------------------------
  *
+ * @class TouchControls
+ * Board to display left/right controls (joystick) and fire button (A button)
+ *
+ */
+
+var TouchControls = function() {
+    var gutterWidth = 10,
+        unitWidth = Game.width/5,
+        btnWidth = unitWidth - gutterWidth;
+
+    // @method drawButton
+    // Create a button object with text and state
+    // @param ctx canvas context
+    // @param x coord of button
+    // @param y coord of button
+    // @param txt text for button
+    // @param on boolean for state of button
+    this.drawButton = function(ctx, x, y, txt, on) {
+        ctx.globalAlpha = on ? 0.9 : 0.6;
+        ctx.fillStyle = '#ccc';
+        ctx.fillRect(x, y, btnWidth, btnWidth);
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.globalAlpha = 1.0;
+        ctx.font = 'bold '+ (3 * unitWidth/4) +'px arial';
+        ctx.fillText(txt, x + btnWidth/2, y + 3 * btnWidth/4 + 5);
+    };
+
+    // @method draw
+    // Render touch controls on the canvas context
+    // @param ctx canvas context
+    this.draw = function(ctx) {
+        ctx.save();
+        var y= Game.height - unitWidth;
+        this.drawSquare(ctx, gutterWidth, y, '\u25C0'. Game.keys.left);
+        this.drawSquare(ctx, unitWidth + gutterWidth, y, '\u25B6'. Game.keys.right);
+        this.drawSquare(ctx, 4 * unitWidth + gutterWidth, y, 'A'. Game.keys.fire);
+        ctx.restore();
+    };
+
+    // @method step
+    // Dummy method
+    // @param dt time since last loop
+    this.step = function(dt) {
+    };
+};
+
+/* ---------------------------------------------------------------------------
+ *
  * @class GamePoints
  * Simple board to display the 1 up score and high score
  *
@@ -156,7 +205,7 @@ var GamePoints = function() {
     // @param ctx canvas context
     this.draw = function(ctx) {
         var text = ''+ Game.points; // to string
-        ctx.save(); // ?
+        ctx.save();
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
         ctx.font = '14px joystix';
@@ -168,7 +217,7 @@ var GamePoints = function() {
         ctx.fillText(Game.highscore, Game.width/2, 28);
         ctx.textAlign = 'left';
         ctx.fillText(Game.points, 0, 28);
-        ctx.restore(); // ?
+        ctx.restore();
     };
 
     // @method step
