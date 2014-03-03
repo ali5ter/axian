@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.different.axian" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Axian</name>
+    <description>
+        Something vaguely approaching Namco's Galaxian arcade game.
+    </description>
+    <author email="alister@different.com" href="http://axian.different.com">
+        Alister Lewis-Bowen
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+
+    <!-- Hide status bar at top of the screen -->
+    <preference name="Fullscreen" value="true" />
+
+    <!-- Don't display any feedback when users scroll past the beginning or end of content -->
+    <preference name="DisallowOverscroll" value="true" />
+
+</widget>
