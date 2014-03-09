@@ -56,7 +56,7 @@ body {
 #container {
     padding-top: 50px;
     margin: 0 auto;
-    width: 320;   /* same width as canvas */
+    width: 320px;   /* same width as canvas */
 }
 
 canvas {

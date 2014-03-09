@@ -5,3 +5,5 @@ Based on techniques presented by Pascal Retting's excellent book, <cite>Professi
 
 Sprites modified from those originally created by Black Crow.
 
+Web app placed in Cordova wrapper to access device APIs help build to various mobile platforms.
+

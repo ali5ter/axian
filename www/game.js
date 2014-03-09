@@ -37,6 +37,7 @@ var Game = new function() { // singleton
         this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
         if (!this.ctx) { return alert('No canvas available with this browser'); }
         this.setupInput();
+        this.setBoard(10, new TouchControls());
         this.loop();
         this.types = types;
         SpriteSheet.load(sprites, callback);
@@ -552,6 +553,7 @@ Explosion.prototype.step = function(dt) {
 
     window.addEventListener('load', function() {
         Game.init('game', sprites, types, startGame);
+        console.log(window.device.name);
         window.addEventListener('deviceready', function() {
             console.log('device ready');
             // TODO: set up touch controls
