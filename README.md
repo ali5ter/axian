@@ -1,5 +1,3 @@
-> **⚠️ Archived 2025-08-25. No longer maintained.**
-
 # ☄  A•X•I•A•N ☄
 Something vaguely approaching Namco's Galaxian arcade game.
 
